@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="linktableNS">
+<!-- 1. dB table명과 VO field명이 다를 경우  -->
+	<resultMap type="UserVO" id="colMapping">
+		<id column="user_id" property="userId" jdbcType="varchar2" javaType="String"/> <!--Primary Key Column 정의  -->
+		<result column="user_name" property="userName" jdbcType="varchar2" javaType="String"/>
+		<result column="user_password" property="userPassword" jdbcType="varchar2" javaType="String"/>
+		<result column="user_hobby" property="userHobby" jdbcType="varchar2" javaType="String"/>
+	</resultMap>
+
+	<select id="" parameterType="string" resultMap="colMapping">
+		select user_id, user_name, user_password, user_hobby <!--table column name  -->
+		from users where user_id = #{userId}
+	</select>
+
+<!-- 2. vo class field 예시 1
+	class명 -> Comment
+	field명 -> long commentNo, String userId, data regDate, String commentContent;
+	          UserVO user; //사용자 정의 VO type -> user table의 VO 객체 타입
+	          
+	Database query
+	select c.comment_no, c.user_id, c.reg_date, c.comment_content, u.user_name
+	from comment c, user u
+	where c.user_id = u.user_id
+	and c.comment_no = #{commentNo}          
+-->
+	<resultMap type="Comment" id="joinOneNOne">
+		<id column="comment_no" property="commentNo"/>
+		<result column="comment_content" property="commentContent"/>
+		<result column="comment_content" property="commentContent"/>
+		<result column="comment_content" property="commentContent"/>
+		<association property="user" column="user_id" javaType="com.mook.UserVO" >
+			<id column="user_id" property="userId" jdbcType="varchar2" javaType="String"/> <!--Primary Key Column 정의  -->
+			<result column="user_name" property="userName" jdbcType="varchar2" javaType="String"/>
+			<result column="user_password" property="userPassword" jdbcType="varchar2" javaType="String"/>
+			<result column="user_hobby" property="userHobby" jdbcType="varchar2" javaType="String"/>
+		</association>
+	</resultMap>
+
+<!-- 예시2
+	class명 -> CommentUserVO
+	field명 -> CommentVO comment; UserVO user;
+	          
+	Database query
+	select c.comment_no, c.user_id, c.reg_date, c.comment_content, u.user_name
+	from comment c, user u
+	where c.user_id = u.user_id
+	and c.comment_no = #{commentNo}          
+
+ **********************************************************************
+    CommentUserVO cu = null;
+
+	while (rs.next()){
+
+		CommentVO comment = new CommentVO();
+		UserVO user = new UserVO();
+		comment.setCommentNo(rs.getString("c.comment_no"));
+		comment.setUserId(rs.getString("c.user_id"));
+		comment.setRegDate(rs.getString("c.reg_date"));
+		comment.setCommentContent(rs.getString("c.comment_content"));
+		comment.setUserName(rs.getString("c.user_name"));
+	
+	    user.setUserId(rs.getString("u.user_id"));
+	    user.setUserName(rs.getString("u.user_name"));
+	    user.setUserPassword(rs.getString("u.user_password"));
+	
+	    cu = new CommentUserVO();
+	    cu.setComment = comment;
+	    cu.setUser = user;
+	}
+	
+	return cu;
+**********************************************************************
+ 
+-->
+
+	<resultMap type="Comment" id="CommentUser">
+		<association property="comment" column="comment_no" javaType="com.mook.CommentVO" >
+			<id column="comment_no" property="commentNo"/>
+			<result column="comment_content" property="commentContent"/>
+			<result column="comment_content" property="commentContent"/>
+			<result column="comment_content" property="commentContent"/>
+		
+        </association>		
+		<association property="user" column="user_id" javaType="com.mook.UserVO" >
+			<id column="user_id" property="userId" /> 
+			<result column="user_name" property="userName" />
+			<result column="user_password" property="userPassword" />
+			<result column="user_hobby" property="userHobby" />
+		</association>
+	</resultMap>
+
+
+<!--1:1 Mapping  -->
+
+
+</mapper>  
